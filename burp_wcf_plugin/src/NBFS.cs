@@ -36,27 +36,35 @@ public class NBFSNetConsole
     {
         if (argv.Length == 2)
         {
+            string outputPathSuffix = "_out";
+            string inputPath = argv[1];
             try
             {
                 NBFSNet NBFS = new NBFSNet();
-
+                                
                 if (argv[0].ToLower().Equals("encode"))
                 {
-                    Console.WriteLine(Convert.ToBase64String(NBFS.EncodeBinaryXML(System.Text.ASCIIEncoding.ASCII.GetString(Convert.FromBase64String(argv[1])))));
+                    File.WriteAllText(inputPath + outputPathSuffix,
+                        System.Text.Encoding.UTF8.GetString(
+                        NBFS.EncodeBinaryXML(
+                            File.ReadAllText(inputPath, System.Text.Encoding.UTF8))
+                        ), System.Text.Encoding.UTF8);
                 }
                 else
                 {
-                    Console.WriteLine(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(NBFS.DecodeBinaryXML(Convert.FromBase64String(argv[1])))));
+                    File.WriteAllText(inputPath + outputPathSuffix, 
+                        NBFS.DecodeBinaryXML(System.Text.Encoding.UTF8.GetBytes(File.ReadAllText(inputPath, System.Text.Encoding.UTF8)))
+                        , System.Text.Encoding.UTF8);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(e.Message)));
+                File.WriteAllText(inputPath + outputPathSuffix, e.Message, System.Text.Encoding.UTF8);
             }
         }
         else
         {
-            Console.WriteLine("Usage: NBFS [encode|decode] Base64Data\n\nNOTE: All output, including exceptions, will be returned as a Base64 string.");
+            Console.WriteLine("Usage: NBFS [encode|decode] path2File\n\nNOTE: All output, including exceptions, will be returned in path2File_out file.");
         }
     }
 }
