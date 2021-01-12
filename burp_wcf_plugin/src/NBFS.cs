@@ -47,13 +47,14 @@ public class NBFSNetConsole
                     File.WriteAllText(inputPath + outputPathSuffix,
                         System.Text.Encoding.UTF8.GetString(
                         NBFS.EncodeBinaryXML(
-                            File.ReadAllText(inputPath, System.Text.Encoding.UTF8))
-                        ), System.Text.Encoding.UTF8);
+                            File.ReadAllText(inputPath, System.Text.ASCIIEncoding.ASCII))
+                        //), System.Text.Encoding.UTF8);
+                        ), System.Text.ASCIIEncoding.ASCII);
                 }
                 else
                 {
                     File.WriteAllText(inputPath + outputPathSuffix, 
-                        NBFS.DecodeBinaryXML(System.Text.Encoding.UTF8.GetBytes(File.ReadAllText(inputPath, System.Text.Encoding.UTF8)))
+                        NBFS.DecodeBinaryXML(System.Text.ASCIIEncoding.ASCII.GetBytes(File.ReadAllText(inputPath, System.Text.ASCIIEncoding.ASCII)))
                         , System.Text.Encoding.UTF8);
                 }
             }
