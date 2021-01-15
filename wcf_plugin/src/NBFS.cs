@@ -27,8 +27,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Xml;
 using System.IO;
+using System.Xml;
 
 public class NBFSNetConsole
 {
@@ -36,27 +36,34 @@ public class NBFSNetConsole
     {
         if (argv.Length == 2)
         {
+            string outputPathSuffix = "_out";
+            string inputPath = argv[1];
+
             try
             {
                 NBFSNet NBFS = new NBFSNet();
 
+                // Some antiviruses might block large console output, so, using file output instead
                 if (argv[0].ToLower().Equals("encode"))
                 {
-                    Console.WriteLine(Convert.ToBase64String(NBFS.EncodeBinaryXML(System.Text.ASCIIEncoding.ASCII.GetString(Convert.FromBase64String(argv[1])))));
+                    //Console.WriteLine(Convert.ToBase64String(NBFS.EncodeBinaryXML(System.Text.ASCIIEncoding.ASCII.GetString(Convert.FromBase64String((new StreamReader(inputPath)).ReadToEnd())))));
+                    File.WriteAllBytes(inputPath + outputPathSuffix, NBFS.EncodeBinaryXML(System.Text.ASCIIEncoding.ASCII.GetString(Convert.FromBase64String((new StreamReader(inputPath)).ReadToEnd()))));
                 }
                 else
                 {
-                    Console.WriteLine(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(NBFS.DecodeBinaryXML(Convert.FromBase64String(argv[1])))));
+                    //Console.WriteLine(NBFS.DecodeBinaryXML(Convert.FromBase64String((new StreamReader(argv[1])).ReadToEnd())));
+                    File.WriteAllText(inputPath + outputPathSuffix,
+                        NBFS.DecodeBinaryXML(Convert.FromBase64String((new StreamReader(inputPath)).ReadToEnd())));
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(e.Message)));
+                Console.WriteLine(e.Message +" "+ e.StackTrace);
             }
         }
         else
         {
-            Console.WriteLine("Usage: NBFS [encode|decode] Base64Data\n\nNOTE: All output, including exceptions, will be returned as a Base64 string.");
+            Console.WriteLine("Usage: NBFS [encode|decode] Base64DataFile.");
         }
     }
 }
@@ -125,11 +132,11 @@ public class WcfBinaryCodec
             ConformanceLevel = ConformanceLevel.Auto,
             Encoding = m_encoding,
             Indent = explode,
-            IndentChars = "\t",
-            NewLineChars = Environment.NewLine,
-            NewLineHandling = explode ? NewLineHandling.Replace : NewLineHandling.None,
-            NewLineOnAttributes = explode
-            // QuoteChar = '"' 
+            //IndentChars = "\t",
+            //NewLineChars = Environment.NewLine,
+            //NewLineHandling = explode ? NewLineHandling.Replace : NewLineHandling.None,
+            //NewLineOnAttributes = explode
+            DoNotEscapeUriAttributes = false
         };
         using (var writer = XmlWriter.Create(xmlOutput, settings))
         {
@@ -210,6 +217,7 @@ public static class WcfDictionaryBuilder
         dict.Add("Transforms");
         dict.Add("Transform");
         dict.Add("DigestMethod");
+        dict.Add("DigestValue");
         dict.Add("Address");
         dict.Add("ReplyTo");
         dict.Add("SequenceAcknowledgement");
@@ -678,4 +686,3 @@ public static class WcfDictionaryBuilder
         dict.Add("Detail");
     }
 }
-
